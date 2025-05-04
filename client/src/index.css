@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+  --primary: 146 77% 24%;
+  --primary-light: 146 70% 33%;
+  --primary-dark: 146 85% 15%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 45 65% 52%;
+  --secondary-light: 45 70% 60%;
+  --secondary-dark: 45 60% 45%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 60 4.8% 95.9%;
+  --accent-foreground: 24 9.8% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --ring: 146 77% 24%;
+  --radius: 0.5rem;
+  
+  --sand: 43 44% 94%;
+  --sand-light: 43 44% 98%;
+  --sand-dark: 43 44% 90%;
+  
+  --neutral-dark: 0 0% 20%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 146 77% 24%;
+  --primary-light: 146 70% 33%;
+  --primary-dark: 146 85% 15%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 45 65% 52%;
+  --secondary-light: 45 70% 60%;
+  --secondary-dark: 45 60% 45%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 146 77% 24%;
+  --radius: 0.5rem;
+  
+  --sand: 43 30% 15%;
+  --sand-light: 43 30% 20%;
+  --sand-dark: 43 30% 10%;
+  
+  --neutral-dark: 0 0% 15%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-tajawal;
+  }
+}
+
+@layer utilities {
+  .font-tajawal {
+    font-family: 'Tajawal', sans-serif;
+  }
+  
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .bg-sand {
+    background-color: hsl(var(--sand));
+  }
+  
+  .bg-sand-light {
+    background-color: hsl(var(--sand-light));
+  }
+  
+  .bg-sand-dark {
+    background-color: hsl(var(--sand-dark));
+  }
+  
+  .bg-neutral-dark {
+    background-color: hsl(var(--neutral-dark));
+  }
+  
+  .text-neutral-dark {
+    color: hsl(var(--neutral-dark));
+  }
+  
+  .rtl {
+    direction: rtl;
+  }
+  
+  .ltr {
+    direction: ltr;
+  }
+  
+  .timer-box {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .timer-box::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 3px;
+    background-color: hsl(var(--secondary));
+    animation: timer 60s linear infinite;
+    width: 100%;
+  }
+  
+  @keyframes timer {
+    0% {
+      width: 100%;
+    }
+    100% {
+      width: 0%;
+    }
+  }
+  
+  .auction-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .auction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bid-button {
+    transition: transform 0.15s ease;
+  }
+  
+  .bid-button:active {
+    transform: scale(0.97);
+  }
+}
