@@ -1,3 +1,17 @@
+/* File: client/src/hooks/use-auth.tsx */
+
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthProvider"; // Adjust path if needed
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
+
+
 import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
