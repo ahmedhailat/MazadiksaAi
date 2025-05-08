@@ -10,7 +10,7 @@ import AuctionsPage from "@/pages/auctions-page";
 import AuctionDetailsPage from "@/pages/auction-details-page";
 import ProfilePage from "@/pages/profile-page";
 import ContactPage from "@/pages/contact-page";
-import { AuthProvider } from "@/hooks/use-auth";
+import {import useAuth from './hooks/use-auth.tsx';
 import { ProtectedRoute } from "@/lib/protected-route";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@/lib/i18n";
