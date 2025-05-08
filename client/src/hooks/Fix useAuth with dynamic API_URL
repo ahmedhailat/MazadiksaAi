@@ -15,7 +15,7 @@ export function useAuth() {
 mutationFn: async (details: { name: string; email: string; password: string }) => {
   const res = await axios.post(`${API_URL}/api/register`, {
     ...details,
-    passwordConfirmation: details.password,
+   confirmPassword: details.password,
   });
   return res.data;
 },
