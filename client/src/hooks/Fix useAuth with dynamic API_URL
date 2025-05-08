@@ -12,9 +12,14 @@ export function useAuth() {
   const { setUser } = useUserStore();
 
   const login = useMutation({
-    mutationFn: async (credentials: { email: string; password: string }) => {
-      const res = await axios.post(`${API_URL}/api/login`, credentials);
-      return res.data;
+   mutationFn: async (details: { name: string; email: string; password: string }) => {
+  const res = await axios.post(`${API_URL}/api/register`, {
+    ...details,
+    passwordConfirmation: details.password,
+  });
+  return res.data;
+},
+
     },
     onSuccess: (data) => {
       setUser(data.user);
