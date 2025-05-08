@@ -143,8 +143,14 @@
   "exclude": ["node_modules"]
 }
 {
+ {
+  "dependencies": {
+    "some-package": "^1.2.4"
+  },
   "engines": {
     "node": "18.16.0",
     "npm": "9.x.x"
+  }
+}
   }
 }
