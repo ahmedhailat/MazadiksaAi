@@ -1,3 +1,4 @@
+npm install i18next react-i18next
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
