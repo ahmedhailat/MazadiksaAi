@@ -150,3 +150,11 @@ export const useAuth = () => {
   }
   return context;
 };
+// Example usage in your useAuth hook:
+onError: (error: Error) => {
+  toast({
+    title: t('auth.loginError'), // Matches the key in i18n.ts
+    description: error.message,
+    variant: 'destructive',
+  });
+},
