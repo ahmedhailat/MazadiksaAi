@@ -20,6 +20,7 @@ mutationFn: async (details: { name: string; email: string; password: string }) =
   return res.data;
 },
 
+
     onSuccess: (data) => {
       setUser(data.user);
       navigate("/");
