@@ -154,3 +154,6 @@
 }
   }
 }
+git add package.json
+git commit -m "Fix JSON syntax in package.json"
+git push
