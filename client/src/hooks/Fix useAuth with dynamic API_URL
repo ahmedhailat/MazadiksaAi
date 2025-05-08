@@ -15,11 +15,10 @@ export function useAuth() {
 mutationFn: async (details: { name: string; email: string; password: string }) => {
   const res = await axios.post(`${API_URL}/api/register`, {
     ...details,
-    confirmPassword: details.password,
+    passwordConfirmation: details.password,
   });
   return res.data;
 },
-
 
     onSuccess: (data) => {
       setUser(data.user);
