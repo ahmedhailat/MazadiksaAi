@@ -1,0 +1,75 @@
+import { useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { useUserStore } from "@/store/user-store";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+export function useAuth() {
+  const navigate = useNavigate();
+  const { setUser } = useUserStore();
+
+  const login = useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const res = await axios.post(`${API_URL}/api/login`, credentials);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setUser(data.user);
+      navigate("/");
+    },
+    onError: () => {
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const register = useMutation({
+    mutationFn: async (details: { name: string; email: string; password: string }) => {
+      const res = await axios.post(`${API_URL}/api/register`, details);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Registration successful",
+        description: "You can now log in.",
+      });
+      navigate("/login");
+    },
+    onError: () => {
+      toast({
+        title: "Registration failed",
+        description: "Please check your details and try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const logout = useMutation({
+    mutationFn: async () => {
+      await axios.post(`${API_URL}/api/logout`);
+    },
+    onSuccess: () => {
+      setUser(null);
+      navigate("/login");
+    },
+  });
+
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/api/me`)
+      .then((res) => {
+        setUser(res.data.user);
+      })
+      .catch(() => {
+        setUser(null);
+      });
+  }, [setUser]);
+
+  return { login, register, logout };
+}
