@@ -1,6 +1,4 @@
-git add package.json
-git commit -m "Fix JSON syntax in package.json"
-git push
+
 {
   "name": "rest-express",
   "version": "1.0.0",
@@ -124,9 +122,9 @@ git push
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
+      "@ @hooks/*": ["src/hooks/*"],
       "@pages/*": ["src/pages/*"],
-      "@assets/*": ["src/assets/*"]
+      "@ @assets/*": ["src/assets/*"]
     },
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client"],
