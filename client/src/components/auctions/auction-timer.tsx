@@ -1,55 +1,49 @@
+
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Clock } from "lucide-react";
 
 interface AuctionTimerProps {
-  endTime: string | Date;
+  endDate: Date;
 }
 
-export function AuctionTimer({ endTime }: AuctionTimerProps) {
-  const { t } = useTranslation();
-  const [timeRemaining, setTimeRemaining] = useState('');
-  const [isExpired, setIsExpired] = useState(false);
-  
+export function AuctionTimer({ endDate }: AuctionTimerProps) {
+  const [timeLeft, setTimeLeft] = useState("");
+  const { i18n } = useTranslation();
+
+  const getArabicNumeral = (num: number): string => {
+    const arabicNums = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    return num.toString().replace(/[0-9]/g, (w) => arabicNums[+w]);
+  };
+
   useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const now = new Date();
-      const end = new Date(endTime);
-      const timeDifference = end.getTime() - now.getTime();
-      
-      if (timeDifference <= 0) {
-        setIsExpired(true);
-        return '00:00:00';
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const end = new Date(endDate).getTime();
+      const distance = end - now;
+
+      if (distance < 0) {
+        setTimeLeft("00:00:00");
+        clearInterval(timer);
+        return;
       }
+
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       
-      // Calculate hours, minutes, seconds
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-      
-      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-    
-    // Initial calculation
-    setTimeRemaining(calculateTimeRemaining());
-    
-    // Update every second
-    const intervalId = setInterval(() => {
-      const remaining = calculateTimeRemaining();
-      setTimeRemaining(remaining);
-      
-      if (remaining === '00:00:00') {
-        clearInterval(intervalId);
-      }
+      setTimeLeft(i18n.language === 'ar' ? getArabicNumeral(parseInt(timeString.replace(/:/g, ''))) : timeString);
     }, 1000);
-    
-    return () => clearInterval(intervalId);
-  }, [endTime]);
-  
+
+    return () => clearInterval(timer);
+  }, [endDate, i18n.language]);
+
   return (
-    <div className="flex justify-center items-center space-x-3 space-x-reverse">
-      <Clock className="text-secondary h-4 w-4" />
-      <span>{isExpired ? t("auctions.auctionEnded") : timeRemaining}</span>
+    <div className="flex items-center gap-2 text-primary">
+      <Clock className="w-4 h-4" />
+      <span className="font-mono">{timeLeft}</span>
     </div>
   );
 }
