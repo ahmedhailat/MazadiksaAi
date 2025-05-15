@@ -1,3 +1,4 @@
+npm install i18next react-i18next
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -10,7 +11,7 @@ import AuctionsPage from "@/pages/auctions-page";
 import AuctionDetailsPage from "@/pages/auction-details-page";
 import ProfilePage from "@/pages/profile-page";
 import ContactPage from "@/pages/contact-page";
-import { AuthProvider } from "@/hooks/use-auth";
+import {import useAuth from './hooks/use-auth.tsx';
 import { ProtectedRoute } from "@/lib/protected-route";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -41,6 +42,28 @@ function App() {
         </AuthProvider>
       </I18nextProvider>
     </QueryClientProvider>
+  );
+}
+
+export default App;
+import { Suspense } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
+import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './hooks/useAuth';
+
+function App() {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Suspense fallback={<div>Loading...</div>}>
+            <AppRoutes />
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
+    </I18nextProvider>
   );
 }
 

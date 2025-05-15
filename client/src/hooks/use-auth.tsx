@@ -1,54 +1,76 @@
 import { createContext, ReactNode, useContext } from "react";
+import axios from "axios";
 import {
   useQuery,
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
-import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+// Create axios instance with default config
+const apiClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 type AuthContextType = {
   user: SelectUser | null;
   isLoading: boolean;
-  error: Error | null;
-  loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
-  logoutMutation: UseMutationResult<void, Error, void>;
-  registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  login: UseMutationResult<SelectUser, Error, LoginData>;
+  register: UseMutationResult<SelectUser, Error, RegisterCredentials>;
+  logout: UseMutationResult<void, Error, void>;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
+interface RegisterCredentials extends InsertUser {
+  confirmPassword: string;
+}
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { t } = useTranslation();
-  
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useQuery<SelectUser | null, Error>({
+
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/api/user");
+        return response.data;
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          return null;
+        }
+        throw error;
+      }
+    },
+    retry: false,
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      const response = await apiClient.post("/api/login", credentials);
+      return response.data;
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
       toast({
-        title: t("auth.loginTitle"),
-        description: `${t("auth.welcomeText")}, ${user.fullName || user.username}!`,
+        title: t("common.login_success"),
+        variant: "default",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t("auth.loginTitle"),
+        title: t("common.login_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -56,20 +78,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (credentials: InsertUser) => {
-      const res = await apiRequest("POST", "/api/register", credentials);
-      return await res.json();
+    mutationFn: async (credentials: RegisterCredentials) => {
+      // Validate passwords match
+      if (credentials.password !== credentials.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+
+      // Validate required fields
+      if (!credentials.username || !credentials.password) {
+        throw new Error("Username and password are required");
+      }
+
+      const response = await apiClient.post("/api/register", credentials);
+      return response.data;
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
       toast({
-        title: t("auth.registerTitle"),
-        description: `${t("auth.welcomeText")}, ${user.fullName || user.username}!`,
+        title: t("common.registration_success"),
+        variant: "default",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t("auth.registerTitle"),
+        title: t("common.registration_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -78,18 +110,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      await apiClient.post("/api/logout");
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
       toast({
-        title: t("common.logout"),
-        description: "You have been successfully logged out.",
+        title: t("common.logout_success"),
+        variant: "default",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t("common.logout"),
+        title: t("common.logout_error"),
         description: error.message,
         variant: "destructive",
       });
@@ -99,12 +131,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user: user ?? null,
+        user: error ? null : user || null,
         isLoading,
-        error,
-        loginMutation,
-        logoutMutation,
-        registerMutation,
+        login: loginMutation,
+        register: registerMutation,
+        logout: logoutMutation,
       }}
     >
       {children}
@@ -112,10 +143,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
+};
+// Example usage in your useAuth hook:
+onError: (error: Error) => {
+  toast({
+    title: t('auth.loginError'), // Matches the key in i18n.ts
+    description: error.message,
+    variant: 'destructive',
+  });
+},
